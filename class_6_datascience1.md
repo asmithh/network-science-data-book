@@ -165,11 +165,100 @@ Here, we're grouping our table by the unique values in `column3`. Then, for each
 ## Regressions
 
 ### What is a regression?
-Regressions are used to figure out a model for data. 
-### When are regressions useful?
+Regressions are used to figure out how variables in a dataset are related to each other. Usually, you have a dependent variable (the __outcome__ we care about) and some set of __independent variables__ that influence the outcome. For example, let's say we have a bunch of fish and their dimensional measurements. We want to figure out how much the fish weighs, given its measurements. Regression is one way we can do this!
 
-### When do they fall short?
+In its most basic form, a linear regression will try to minimize the __sum of squared error__. Let's say we have a bunch of observations $y_i$ and $\vec{X_i}$. Each $y_i$ is a numeric value, and each $X_i$ is a vector of dependent variables. We want to find a vector $\vec{\beta}$ such that $\sum_{i=0}^{n} (\vec{\beta} x_i - y_i)^2$ is minimized. This is also referred to the sum of the squares of the residuals -- __residual__ is another word for how incorrect an individual prediction is. In aggregate, we want the amount that we are wrong to be as small as possible. 
+
+We often use $R^2$, or the ["coefficient of determination,"](https://en.wikipedia.org/wiki/Coefficient_of_determination)  to estimate how well a regression explains data. Formally, it takes the following form:
+$SS_{res} = \sum_{i=0}^{n} (\vec{\beta} x_i - y_i)^2$ is the sum of the squares of the __residuals__ (remember, this is how wrong an individual prediction is).
+$SS_{tot} = \sum_{i=0}^{n} (y_i - \bar{y})^2$ is the __total sum of squares__ - this is proportional to the variance of the dataset. 
+
+Now, $R^2 = 1 - \frac{SS_{res}}{SS_{tot}}$. In other words, we're asking "how big is our error compared to all the variance in the dataset?"
+
+#### When are regressions useful?
+Regressions are useful for figuring out how different independent variables affect a dependent variable. They are also helpful in predicting how a system might act in the future. For example, if you have a lot of fish and a linear regression model that can predict their weights pretty well, you can then measure even more fish and predict their weights! 
+#### When do they fall short?
+Sometimes data isn't linear! Other times, you might have something that looks like a good fit, but it doesn't explain your data well. [Anscombe's Quartet](https://en.wikipedia.org/wiki/Anscombe%27s_quartet) is a good example that explains why just going ahead and fitting a linear model to your data may not always be wise! 
+
+![Anscombe's Quartet](images/anscombe_quartet.png)
+
+As you can see, these datasets are doing very different things, but the linear model that best describes them is the same for all four datasets. It also fits each dataset as well as the next: the $R^2$ is $0.67$ for all the regressions. This is a cautionary tale: sometimes a linear model is simply not the right model!
 
 ### Running a linear regression on a Pandas dataframe
 
+#### Setting up the dataset
+Now we're going to load another CSV; this time, it will be full of fish measurements that we will attempt to correlate to the fishes' weights. 
+
+```
+df_fish = pd.read_csv('data/Fish.csv')
+df_fish.head(5)
+```
+
+First, we'll try doing a basic regression with sklearn. We need to make two `numpy` arrays for the linear regression module to use. So we're going to learn how to grab `numpy` arrays from a pandas dataframe. We'll use the columns `Length1`, `Length2`, `Length3`, `Height`, and `Width` as our _independent variables_. Our _dependent variable_, of course,  is `Weight`. 
+
+To get a subset of columns from a dataframe, we simply list the columns we want. then call the `.to_numpy()` function. This converts our dataframe into a numeric numpy array:
+
+```
+col_subset = df_fish[['Length1', 'Length2', 'Length3', 'Height', 'Width']]
+x_mtx = col_subset.to_numpy()
+
+```
+
+Can you figure out how to obtain the array of fish weights?
+
+
+#### Importing `sklearn`
+`sklearn`, or [scikit-learn](https://scikit-learn.org/stable/index.html), is a Python package that has a bunch of machine learning algorithms built in. We're going to use it to practice running linear regressions. 
+
+```
+from sklearn import linear_model
+reg = linear_model.LinearRegression()
+reg.fit(x_mtx, y_mtx)
+
+```
+We have created a `LinearRegression` object, called `reg`. When we call the `fit()` method, we compute the best coefficients to multiply the values in `x_mtx` by to get something close to `y_mtx`. How good is our model? The `score()` method gives us $R^2$. 
+```
+reg.score(x_mtx, y_mtx)
+
+```
+That's not too bad!
+
+#### Adding in Fish Species
+What if our fish are different densities depending on species? Let's see if we can make our regression a little better. One way to do this is to introduce a _categorical variable_. In this case, we'll have a column for each fish species. Its entry for each row will take the value $1$ if the fish in that row is of that species; otherwise, it'll be $0$. This is really easy to do with `pandas`:
+```
+df_fish["fish_category"] = df_fish["Species"].astype("category")
+fish_dummies = pd.get_dummies(df_fish['fish_category'], prefix='species_')
+
+```
+We've created what's called one-hot encodings, or dummmy variables, which is great news for our fish regression! Let's create a matrix of species dummy variables:
+```
+species_mtx = fish_dummies.to_numpy()
+
+```
+And now we'll concatenate that (along the horizontal axis) to our original matrix of fish measurements:
+```
+x_new = np.hstack([species_mtx, x_mtx])
+
+```
+
+We'll make a new regression object:
+```
+reg1 = linear_model.LinearRegression()
+reg1.fit(x_new, y_mtx)
+
+```
+
+How did we do??
+```
+reg1.score(x_new, y_mtx)
+
+```
+That's better! Adding more information doesn't always help, but this time around it did!
+
+#### Getting Fancy
+We can also use something called a *kernel function* to transform our linear data into higher dimensional space. Specifically, we can apply arbitrary functions to our fish data and add them to our linear regression matrices. Let's say we have two concentric circles as a dataset:
+![Concentric circles](images/concentric_circles.png)
+We're going to have a hard time separating these with either of their $x$ and $y$ coordinates! But what if we add a new column that is $\sqrt{x_i^2 + y_i^2}$? We're able to separate them easily because we've projected our points into a higher dimensional space. Neat!!
+
+Let's try applying this to the fish dataset. Can you engineer a new column for the fish dataset that improves your $R^2$?
 
