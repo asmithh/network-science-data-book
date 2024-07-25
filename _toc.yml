@@ -1,0 +1,15 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: intro
+chapters:
+- file: class_1_intro
+- file: class_2_networkx1
+- file: class_3_networkx2
+- file: class_4_scraping1
+- file: class_5_scraping2
+- file: class_6_datascience1
+- file: class_7_datascience2
+- file: class_8_distributions
+- file: class_9_bigdata1
