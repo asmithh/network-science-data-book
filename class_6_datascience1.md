@@ -124,43 +124,71 @@ Tabular data lends itself well to being organized in rows and columns. Each row 
 #### When is it used?
 SQL is used a lot in industry to store and query data for analytic purposes. When you have a ton of data to deal with, SQL is a great way to do that. 
 
+### Getting connected to SQL on Discovery
+We'll connect to SQL on Discovery using `psycopg2`. This is a package that lets you connect to a PostgreSQL database using Python, so we can connect from right inside our Jupyter notebooks on Discovery. 
+
 ### How do we query an SQL table?
-The most basic way to extract data from an SQL table is selecting everything:
+The most basic way to extract data from an SQL table is selecting everything. Here we have a table of species in a Florida marine ecosystem, their node IDs, and the category of organisms they belong to. Let's select them all:
 ```
-SELECT * FROM table;
+SELECT * FROM fla_species;
 ```
-This will get us everything in `table`, so sometimes it's not a good idea to pull **all the data**. In this case, we can set a limit of 5 entries:
+This will get us everything in `fla_species`, so sometimes it's not a good idea to pull **all the data**. In this case, we can set a limit of 5 entries:
 ```
-SELECT * FROM table LIMIT 5;
+SELECT * FROM fla_species LIMIT 5;
 ```
-But what if we want to filter our data? In this example, we select all entries from the table named `table` that have a value in `column` greater than 5:
+But what if we want to filter our data? In this example, we select all entries from the table named `table` that have a value in `group` that is equal to `'Pelagic Fishes'`:
 ```
-SELECT * FROM table WHERE column > 5;
+SELECT * FROM fla_species WHERE group = 'Pelagic Fishes';
 
 ```
 
 Or if we want to select based on multiple conditions, we can do this:
 ```
-SELECT * FROM table WHERE column1 > 5 AND column2 < 3;
+SELECT * FROM fla_species WHERE group = 'Pelagic Fishes' AND node_id > 65;
+
+```
+We can select just one or two columns by replacing the `*` with the column names, and if we don't want duplicate rows, we can use `SELECT DISTINCT`: 
+```
+SELECT DISTINCT group FROM fla_species WHERE id < 10;
 
 ```
 
-And if we don't want duplicate rows, we can use `SELECT DISTINCT`: 
+### Aggregating
+What if we want to get aggregate information about the species we're seeing? We can use an operation called `GROUP BY` in SQL to do this. `GROUP BY` puts the table into chunks that all have the same value of the variable we're grouping by. Then, we can aggregate the values in other columns to learn about each group in aggregate. 
 ```
-SELECT DISTINCT * FROM table WHERE column1 > 5 AND column2 < 3;
+SELECT group, COUNT(*) FROM fla_species GROUP BY group;
 
 ```
-### Aggregation
-Just like in pandas, sometimes we might want aggregated information about our tables. 
-In this case, we can use `GROUP BY` and aggregation functions. 
+Here, we're grabbing each value of `group`, a column that refers to the species type, and counting how many rows have that value in their `group` column. `COUNT(*)` tells us how many rows are in each chunk. Other commonly used aggregate operations include `MIN`, `MAX`, and `AVG`. 
+
+### Joining
+We also have a network of species that forms a food web in this Florida marine ecosystem. In a food web edge `(i, j)`, energy (or carbon) flows from organism `i` to organism `j`. A whale eating krill would be rpresented as `(krill, whale)`, for example. Let's select the first few rows of data about our food web:
+```
+SELECT * FROM fla_foodweb LIMIT 10;
 
 ```
-SELECT mean(column1), max(column2) FROM table GROUP BY column3;
+Here we can see that species are referred to by their node IDs -- we saw those in the other table, `fla_species`. What if we want information on the species incorporated with our information on which species consume each other?
+
+We can *join tables* to make this happen. When we join tables, we usually pick a *condition* to use to make sure we are joining together rows correctly. In this case, we want to join based on the ID of the node. Let's try an inner join, also just referred to in SQL as `JOIN`. This matches all items that have values for `ToNodeId` in `fla_foodweb` and `NodeId` in `fla_species`. It does not match items that do not have values in **both tables**. Let's see what happens:
+```
+SELECT * FROM fla_foodweb JOIN fla_species ON fla_foodweb.ToNodeId = fla_species.NodeId LIMIT 10;
 
 ```
-Here, we're grouping our table by the unique values in `column3`. Then, for each unique value in `column3`, we're going to grab the average value that `column1` takes and the max value of `column2`. This allows us to get aggregate information about our data!
+Now we have a species name for each species that's consuming another species! 
 
-### Practicing an SQL Query on the Cluster
+Other types of joins include left joins and right joins. A **left join** will keep all the rows of the left table and add information from the right table if it matches on the condition we're using to match up items. A right join does the opposite. 
+
+We're also going to create a variable in SQL to do some fancy joining now.
+```
+SELECT * FROM (SELECT ToNodeId, COUNT(FromNodeId) FROM fla_foodweb GROUP BY ToNodeId) species_eaten RIGHT JOIN fla_species ON species_eaten.ToNodeId = fla_species.NodeId;
+
+```
+
+What are we doing here? First, we're creating a variable in SQL. It's called `species_eaten`, and it itself is a table. We make it by grouping `fla_foodweb` by `ToNodeId` -- the organism doing the consuming. Then, we count how many other types of organisms that each unique value of `ToNodeId` consumed. That makes our table `species_eaten`!
+
+Now we join it with `fla_species` to get species names attached to our number of species consumed by each organism! Because we're doing a `RIGHT JOIN` operation, and `fla_species` is the right hand table, we're going to keep all the rows of `fla_species`, even if a species does not consume any other species. Some of the rows returned might have null values in some columns, and that is okay!
+
+Can you figure out how to count the number of unique species consumed by each **group** of species? (Hint: the `SELECT DISTINCT` or `COUNT DISTINCT`[operations](https://www.w3schools.com/Sql/sql_distinct.asp) might come in handy here. These only select unique values or combinations of values (if you select multiple columns), so `SELECT DISTINCT group FROM fla_species;` will only show you each value `group` takes once). 
 
 ## Regressions
 
