@@ -145,41 +145,41 @@ cur.fetchall()
 ```
 But what if we want to filter our data? In this example, we select all entries from the table named `table` that have a value in `group` that is equal to `'Pelagic Fishes'`:
 ```
-SELECT * FROM fla_species WHERE group = 'Pelagic Fishes';
-
+cur.execute("SELECT * FROM fla_species WHERE group = 'Pelagic Fishes';")
+cur.fetchall()
 ```
 
 Or if we want to select based on multiple conditions, we can do this:
 ```
-SELECT * FROM fla_species WHERE group = 'Pelagic Fishes' AND node_id > 65;
-
+cur.execute("SELECT * FROM fla_species WHERE group = 'Pelagic Fishes' AND node_id > 65;")
+cur.fetchall()
 ```
 We can select just one or two columns by replacing the `*` with the column names, and if we don't want duplicate rows, we can use `SELECT DISTINCT`: 
 ```
-SELECT DISTINCT group FROM fla_species WHERE id < 10;
-
+cur.execute("SELECT DISTINCT group FROM fla_species WHERE id < 10;")
+cur.fetchall()
 ```
 
 ### Aggregating
 What if we want to get aggregate information about the species we're seeing? We can use an operation called `GROUP BY` in SQL to do this. `GROUP BY` puts the table into chunks that all have the same value of the variable we're grouping by. Then, we can aggregate the values in other columns to learn about each group in aggregate. 
 ```
-SELECT group, COUNT(*) FROM fla_species GROUP BY group;
-
+cur.execute("SELECT group, COUNT(*) FROM fla_species GROUP BY group;")
+cur.fetchall()
 ```
 Here, we're grabbing each value of `group`, a column that refers to the species type, and counting how many rows have that value in their `group` column. `COUNT(*)` tells us how many rows are in each chunk. Other commonly used aggregate operations include `MIN`, `MAX`, and `AVG`. 
 
 ### Joining
 We also have a network of species that forms a food web in this Florida marine ecosystem. In a food web edge `(i, j)`, energy (or carbon) flows from organism `i` to organism `j`. A whale eating krill would be rpresented as `(krill, whale)`, for example. Let's select the first few rows of data about our food web:
 ```
-SELECT * FROM fla_foodweb LIMIT 10;
-
+cur.execute("SELECT * FROM fla_foodweb LIMIT 10;")
+cur.fetchall()
 ```
 Here we can see that species are referred to by their node IDs -- we saw those in the other table, `fla_species`. What if we want information on the species incorporated with our information on which species consume each other?
 
 We can *join tables* to make this happen. When we join tables, we usually pick a *condition* to use to make sure we are joining together rows correctly. In this case, we want to join based on the ID of the node. Let's try an inner join, also just referred to in SQL as `JOIN`. This matches all items that have values for `ToNodeId` in `fla_foodweb` and `NodeId` in `fla_species`. It does not match items that do not have values in **both tables**. Let's see what happens:
 ```
-SELECT * FROM fla_foodweb JOIN fla_species ON fla_foodweb.ToNodeId = fla_species.NodeId LIMIT 10;
-
+cur.execute("SELECT * FROM fla_foodweb JOIN fla_species ON fla_foodweb.ToNodeId = fla_species.NodeId LIMIT 10;")
+cur.fetchall()
 ```
 Now we have a species name for each species that's consuming another species! 
 
@@ -187,8 +187,8 @@ Other types of joins include left joins and right joins. A **left join** will ke
 
 We're also going to create a variable in SQL to do some fancy joining now.
 ```
-SELECT * FROM (SELECT ToNodeId, COUNT(FromNodeId) FROM fla_foodweb GROUP BY ToNodeId) species_eaten RIGHT JOIN fla_species ON species_eaten.ToNodeId = fla_species.NodeId;
-
+cur.execute("SELECT * FROM (SELECT ToNodeId, COUNT(FromNodeId) FROM fla_foodweb GROUP BY ToNodeId) species_eaten RIGHT JOIN fla_species ON species_eaten.ToNodeId = fla_species.NodeId;")
+cur.fetchall()
 ```
 
 What are we doing here? First, we're creating a variable in SQL. It's called `species_eaten`, and it itself is a table. We make it by grouping `fla_foodweb` by `ToNodeId` -- the organism doing the consuming. Then, we count how many other types of organisms that each unique value of `ToNodeId` consumed. That makes our table `species_eaten`!
