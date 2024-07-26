@@ -126,15 +126,22 @@ SQL is used a lot in industry to store and query data for analytic purposes. Whe
 
 ### Getting connected to SQL on Discovery
 We'll connect to SQL on Discovery using `psycopg2`. This is a package that lets you connect to a PostgreSQL database using Python, so we can connect from right inside our Jupyter notebooks on Discovery. 
+```
+import psycopg2
+conn = psycopg2.connect("dbname=test user=postgres")
+cur = conn.cursor()
 
+```
 ### How do we query an SQL table?
 The most basic way to extract data from an SQL table is selecting everything. Here we have a table of species in a Florida marine ecosystem, their node IDs, and the category of organisms they belong to. Let's select them all:
 ```
-SELECT * FROM fla_species;
+cur.execute('SELECT * FROM fla_species;')
+cur.fetchall()
 ```
 This will get us everything in `fla_species`, so sometimes it's not a good idea to pull **all the data**. In this case, we can set a limit of 5 entries:
 ```
-SELECT * FROM fla_species LIMIT 5;
+cur.execute('SELECT * FROM fla_species LIMIT 5;')
+cur.fetchall()
 ```
 But what if we want to filter our data? In this example, we select all entries from the table named `table` that have a value in `group` that is equal to `'Pelagic Fishes'`:
 ```
