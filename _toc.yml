@@ -4,13 +4,13 @@
 format: jb-book
 root: intro
 chapters:
-- file: class_1_intro
-- file: class_2_networkx1
-- file: class_3_networkx2
-- file: class_4_scraping1
-- file: class_5_scraping2
-- file: class_6_datascience1
-- file: class_7_datascience2
-- file: class_8_distributions
-- file: class_9_bigdata1
+- file: class_01_intro
+- file: class_02_networkx1
+- file: class_03_networkx2
+- file: class_04_scraping1
+- file: class_05_scraping2
+- file: class_06_datascience1
+- file: class_07_datascience2
+- file: class_08_distributions
+- file: class_09_bigdata1
 - file: class_10_communities1
