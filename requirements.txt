@@ -1,7 +1,8 @@
 jupyter-book
 matplotlib
-numpy
+numpy==1.19.5
 pandas
+littleballoffur
 psycopg2
 pywikibot
 geopy
