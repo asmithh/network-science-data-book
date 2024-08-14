@@ -33,7 +33,7 @@ jobs:
       with:
         path: ./.venv/  # what we cache: the virtualenv
         # The cache key depends on requirements.txt
-        key: ${{ runner.os }}-venv-${{ hashFiles('./requirements.txt') }}
+        key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements*.txt') }}
         restore-keys: |
           ${{ runner.os }}-venv-
     # Build a virtualenv, but only if it doesn't already exist
@@ -49,12 +49,12 @@ jobs:
       uses: actions/cache@v3
       with:
         path: _build/.jupyter_cache
-        key: jupyter-book-cache-${{ hashFiles('requirements.txt') }}
+        key: jupyter-book-cache-${{ hashFiles('./requirements*.txt') }}
 
     # Build the book
     - name: Build the book
       run: |
-        ./.venv/bin/activate && python3 -m jupyter-book build .
+        ./.venv/bin/activate && python -m jupyter-book build .
 
     # Upload the book's HTML as an artifact
     - name: Upload artifact
