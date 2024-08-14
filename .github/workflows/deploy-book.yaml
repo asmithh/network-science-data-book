@@ -28,10 +28,18 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: 3.11
-
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
+    - uses: actions/cache@v3
+      id: cache-venv  # name for referring later
+      with:
+        path: ./.venv/  # what we cache: the virtualenv
+        # The cache key depends on requirements.txt
+        key: ${{ runner.os }}-venv-${{ hashFiles('./requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-venv-
+    # Build a virtualenv, but only if it doesn't already exist
+    - run: python -m venv ./.venv && . ./.venv/bin/activate && 
+           pip install -r requirements.txt
+      if: steps.cache-venv.outputs.cache-hit != 'true'
 
     # (optional) Cache your executed notebooks between runs
     # if you have config:
@@ -46,7 +54,7 @@ jobs:
     # Build the book
     - name: Build the book
       run: |
-        jupyter-book build .
+        ./.venv/bin/activate && jupyter-book build .
 
     # Upload the book's HTML as an artifact
     - name: Upload artifact
