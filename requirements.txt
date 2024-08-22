@@ -2,7 +2,7 @@ jupyter-book
 matplotlib
 pandas==1.5.3
 littleballoffur
-numpy==1.22.0
+numpy==1.24.0
 psycopg2
 geopy
 networkx
