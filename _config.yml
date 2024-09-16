@@ -4,6 +4,7 @@
 title: PHYS 7332 (Network Science Data)
 author: Matteo Chinazzi, Qian Zhang, Brennan Klein, and Alyssa Smith
 logo: logo.png
+copyright: "2024"
 only_build_toc_files: true
 
 # Force re-execution of notebooks on each build.
