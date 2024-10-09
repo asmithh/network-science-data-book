@@ -34,14 +34,55 @@ The final project for this course is a chance for students to synthesize their k
 
 #### Ideas for Final Project Chapters (non-exhaustive):
 1. Graph Embedding (or other ML technique)
-2. Network Reconstruction
+2. Network Reconstruction from Dynamics
 3. Link Prediction
-4. Graph Distances
+4. Graph Distances and Network Comparison
 5. Motifs in Networks
-6. Network Null Models (advanced)
-7. Network Sparsification
-8. Spectral Properties of Networks (advanced)
-9. Mechanistic vs Statistical Network Models
+6. Network Sparsification
+7. Spectral Properties of Networks
+8. Mechanistic vs Statistical Network Models
+9. Robustness / Resilience of Network Structure
+10. Network Game Theory (Prisoner’s Dilemma, Schelling Model, etc.)
+11. Homophily in Networks
+12. Network Geometry and Random Hyperbolic Graphs
+13. Information Theory in/of Complex Networks
+14. Discrete Models of Network Dynamics (Voter model, Ising model, SIS, etc.)
+15. Continuous Models of Network Dynamics (Kuramoto model, Lotka-Volterra model, etc.)
+16. Percolation in Networks
+17. Signed Networks
+18. Coarse Graining Networks
+19. Mesoscale Structure in Networks (e.g. core-periphery)
+20. Graph Isomorphism and Approximate Isomorphism
+21. Inference in Networks: Beyond Community Detection
+22. Activity-Driven Network Models
+23. Forecasting with Networks
+24. Higher-Order Networks
+25. Introduction to Graph Neural Networks
+26. Hopfield Networks and Boltzmann Machines
+27. Graph Curvature or Topology
+28. Reservoir Computing
+29. Adaptive Networks
+30. Multiplex/Multilayer Networks
+31. Simple vs. Complex Contagion
+32. Graph Summarization Techniques
+33. Network Anomalies
+34. Modeling Cascading Failures
+35. Topological Data Analysis in Networks
+36. Self-organized Criticality in Networks
+37. Network Rewiring Dynamics
+38. Fitting Distributions to Network Data
+39. Hierarchical Networks
+40. Ranking in Networks
+41. Deeper Dive: Random Walks on Networks
+42. Deeper Dive: Directed Networks
+43. Deeper Dive: Network Communities
+44. Deeper Dive: Network Null Models
+45. Deeper Dive: Network Paths and their Statistics
+46. Deeper Dive: Network Growth Models
+47. Deeper Dive: Network Sampling
+48. Deeper Dive: Spatially-Embedded and Urban Networks
+49. Deeper Dive: Hypothesis Testing in Social Networks
+50. Deeper Dive: Working with Massive Data
 
 
 
